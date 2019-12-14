@@ -6,6 +6,8 @@ import java.awt.event.ActionListener;
 
 public class ClientFrame extends Frame {
 
+
+
     TextArea ta = new TextArea();
     TextField tf = new TextField();
 
@@ -24,6 +26,7 @@ public class ClientFrame extends Frame {
             }
         });
         this.setVisible(true);
+        new Client().connect();
     }
 
     public static void main(String[] args) {
