@@ -1,4 +1,4 @@
-package com.demo.netty.t2;
+package com.demo.netty.t3;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
@@ -74,7 +74,9 @@ class ClientChannelInitializer extends ChannelInitializer<SocketChannel> {
 
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
-        ch.pipeline().addLast(new ClientHandler());
+        ch.pipeline()
+                .addLast(new TankMsgEncoder())
+                .addLast(new ClientHandler());
     }
 }
 
@@ -100,8 +102,9 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         //channel第一次连接上可用，会打印出字符串
-        ByteBuf buf = Unpooled.copiedBuffer("hello world".getBytes());
-        ctx.writeAndFlush(buf);
+        /*ByteBuf buf = Unpooled.copiedBuffer("hello world".getBytes());
+        ctx.writeAndFlush(buf);*/
+        ctx.writeAndFlush(new TankMsg(5, 8));
     }
 }
 

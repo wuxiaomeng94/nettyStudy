@@ -1,6 +1,4 @@
-package com.demo.netty.t2;
-
-import com.demo.netty.t2.Server;
+package com.demo.netty.t3;
 
 import java.awt.*;
 import java.awt.event.WindowAdapter;

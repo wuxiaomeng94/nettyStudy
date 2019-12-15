@@ -1,19 +1,21 @@
-package com.demo.netty.t1;
+package com.demo.netty.t2;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.util.ReferenceCountUtil;
 import io.netty.util.concurrent.GlobalEventExecutor;
 
 public class Server {
 
-    public static void main(String[] args) {
+    public static ChannelGroup clients = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+
+    public void startServer() {
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup(2);
 
@@ -31,7 +33,8 @@ public class Server {
                         }
                     }).bind(8888).sync();
 
-            System.out.println("server start!");
+            //System.out.println("server start!");
+            ServerFrame.INSTANCE.updateServerMsg("server start!");
             future.channel().closeFuture().sync();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -40,11 +43,8 @@ public class Server {
             bossGroup.shutdownGracefully();
         }
 
+
     }
-
-
-    public static ChannelGroup clients = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
-
 
 }
 
@@ -52,7 +52,7 @@ class ServerChildHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        Server.clients.add(ctx.channel());
+
     }
 
     @Override
@@ -65,9 +65,11 @@ class ServerChildHandler extends ChannelInboundHandlerAdapter {
             byte[] bytes = new byte[buf.readableBytes()];
             buf.getBytes(buf.readerIndex(), bytes);
             String str = new String(bytes);
+            ServerFrame.INSTANCE.updateClientMsg(str);
             System.out.println(str);
             if ("exit".equals(str)) {
-                System.out.println("客户端退出");
+                //System.out.println("客户端退出");
+                ServerFrame.INSTANCE.updateClientMsg("客户端退出");
                 Server.clients.remove(ctx.channel());
                 ctx.close();
             }
